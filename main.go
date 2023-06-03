@@ -22,12 +22,14 @@ const (
 var validExtensions = []string{"jpg", "png"}
 
 func main() {
+	var verbose bool
 	var encode bool
 	var decode bool
 	var imagePath string
 	var secret string
 	var secretPath string
 
+	flag.BoolVar(&verbose, "verbose", false, "verbose logging")
 	flag.BoolVar(&encode, "encode", false, "encode image file")
 	flag.BoolVar(&decode, "decode", false, "decode image file")
 	flag.StringVar(&imagePath, "image-path", "", "path to image")
@@ -35,6 +37,10 @@ func main() {
 	flag.StringVar(&secretPath, "secret-path", "", "path to secret file")
 
 	flag.Parse()
+
+	if verbose {
+		logrus.SetLevel(logrus.DebugLevel)
+	}
 
 	if !encode && !decode || encode && decode {
 		logrus.Warnf("must pass either -encode or -decode")
@@ -86,7 +92,7 @@ func main() {
 		}
 
 		var message string
-		logrus.Infof("getting secret")
+		logrus.Debugf("getting secret")
 
 		if secret != "" {
 			message = secret
@@ -133,7 +139,7 @@ func main() {
 
 //Encode image file
 func encodeImage(name string, extension string, img image.Image) error {
-	logrus.Infof("encoding image")
+	logrus.Debugf("encoding image")
 	path := fmt.Sprintf("%s.%s", name, extension)
 
 	// Save the encoded image to a file
@@ -162,7 +168,7 @@ func encodeImage(name string, extension string, img image.Image) error {
 
 //Decode image file
 func decodeImage(name string, extension string) (image.Image, error) {
-	logrus.Infof("decoding image")
+	logrus.Debugf("decoding image")
 	// Open the image file
 	var img image.Image
 	var err error
@@ -217,7 +223,7 @@ func canFitMessage(img image.Image, message string) bool {
 
 // Embeds the secret message into the image using LSB steganography
 func embedSecretMessage(originalImg image.Image, encodedImg *image.RGBA, message string) {
-	logrus.Infof("embedding secret")
+	logrus.Debugf("embedding secret")
 	bounds := originalImg.Bounds()
 
 	// Iterate over each pixel in the image
@@ -300,8 +306,8 @@ func decodeSecretMessage(encodedImg image.Image) string {
 			}
 		}
 
-		logrus.Infof("messageBytes: %+v", messageBytes)
-		logrus.Infof("messageBytes: %s", string(messageBytes))
+		logrus.Debugf("messageBytes: %+v", messageBytes)
+		logrus.Debugf("messageBytes: %s", string(messageBytes))
 
 		// Check if the message termination character is encountered
 		if len(messageBytes) >= 8 && bytes.Equal(messageBytes[len(messageBytes)-8:], []byte{0, 0, 0, 0, 0, 0, 0, 0}) {
