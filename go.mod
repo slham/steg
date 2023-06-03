@@ -8,6 +8,7 @@ require (
 )
 
 require (
+	github.com/auyer/steganography v1.0.2 // indirect
 	golang.org/x/exp v0.0.0-20220303212507-bbda1eaf7a17 // indirect
 	golang.org/x/sys v0.0.0-20220715151400-c0bba94af5f8 // indirect
 )
